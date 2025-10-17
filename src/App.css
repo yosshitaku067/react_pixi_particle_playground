@@ -1,0 +1,112 @@
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+
+.control-panel {
+  width: 300px;
+  background-color: #1e1e1e;
+  color: #ffffff;
+  padding: 20px;
+  overflow-y: auto;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.control-panel h1 {
+  margin: 0 0 20px 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  border-bottom: 2px solid #007acc;
+  padding-bottom: 10px;
+}
+
+.control-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-group label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #cccccc;
+}
+
+.control-group input,
+.control-group select {
+  padding: 8px 12px;
+  background-color: #2d2d2d;
+  color: #ffffff;
+  border: 1px solid #3e3e42;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.control-group input:hover,
+.control-group select:hover {
+  border-color: #007acc;
+}
+
+.control-group input:focus,
+.control-group select:focus {
+  outline: none;
+  border-color: #007acc;
+  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
+}
+
+.value-display {
+  font-size: 0.8rem;
+  color: #888888;
+  margin-top: 4px;
+}
+
+.color-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.color-input-wrapper input[type="color"] {
+  width: 50px;
+  height: 40px;
+  border: 2px solid #3e3e42;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.color-input-wrapper input[type="color"]:hover {
+  border-color: #007acc;
+}
+
+.color-input-wrapper input[type="color"]:focus {
+  outline: none;
+  border-color: #007acc;
+  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
+}
+
+.color-value {
+  font-size: 0.85rem;
+  color: #999999;
+  font-family: monospace;
+  padding: 4px 8px;
+  background-color: #2d2d2d;
+  border-radius: 3px;
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  .control-panel {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    border-bottom: 2px solid #3e3e42;
+  }
+}

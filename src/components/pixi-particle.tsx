@@ -26,10 +26,13 @@ class Dot extends Sprite {
 }
 
 interface Props {
-  imageSizePixels?: number;
+  imageSrc: string;
+  dotSize?: number;
+  backgroundColor?: string | number;
+  particleColor?: string | number;
 }
 
-function PixiParticle({ imageSizePixels = 2 }: Props) {
+function PixiParticle({ dotSize = 2, imageSrc, backgroundColor = 0x000000, particleColor = 0xffffff }: Props) {
   const divRef = useRef<HTMLDivElement>(null);
 
   const init = useCallback(async () => {
@@ -41,16 +44,34 @@ function PixiParticle({ imageSizePixels = 2 }: Props) {
 
     // 画像を読み込む
     const image = new Image();
-    image.src = "images/Sidekick.logo.png";
+    image.src = imageSrc;
     await image.decode();
 
     // PIXIのアプリケーションを作成する
     const app = new Application();
 
+    // 背景色を数値に変換（必要な場合）
+    let bgColor: number;
+    if (typeof backgroundColor === "string") {
+      // HEX文字列を数値に変換
+      bgColor = parseInt(backgroundColor.replace("#", ""), 16);
+    } else {
+      bgColor = backgroundColor;
+    }
+
+    // パーティクル色を数値に変換（必要な場合）
+    let particleColorNum: number;
+    if (typeof particleColor === "string") {
+      // HEX文字列を数値に変換
+      particleColorNum = parseInt(particleColor.replace("#", ""), 16);
+    } else {
+      particleColorNum = particleColor;
+    }
+
     await app.init({
       antialias: true,
       resizeTo: window,
-      backgroundColor: 0x000000,
+      backgroundColor: bgColor,
       resolution: devicePixelRatio,
     });
 
@@ -59,7 +80,7 @@ function PixiParticle({ imageSizePixels = 2 }: Props) {
 
     // ドットサイズの大きさ。1は等倍。
     // 1は綺麗だけど、TLの初期化に時間を要するのでやむなく倍化で。
-    const DOT_SIZE = imageSizePixels;
+    const DOT_SIZE = dotSize;
 
     // 画像のサイズを算出
     const imageW = image.width;
@@ -117,6 +138,7 @@ function PixiParticle({ imageSizePixels = 2 }: Props) {
       dot.x = x - imageW / 2;
       dot.y = y - imageH / 2;
       dot.offsetIndex = i;
+      dot.tint = particleColorNum;
       container.addChild(dot);
 
       dots.push(dot);
@@ -198,7 +220,7 @@ function PixiParticle({ imageSizePixels = 2 }: Props) {
     };
     window.addEventListener("resize", resize);
     resize();
-  }, [imageSizePixels]);
+  }, [dotSize, imageSrc, backgroundColor, particleColor]);
 
   useEffect(() => {
     init();
