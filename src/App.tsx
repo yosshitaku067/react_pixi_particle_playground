@@ -3,20 +3,43 @@ import PixiParticle from "./components/pixi-particle";
 import "./App.css";
 
 function App() {
-  const imageSizeId = useId();
-  const imageSrcId = useId();
+  const textId = useId();
+  const fontSizeId = useId();
+  const fontFamilyId = useId();
+  const fontWeightId = useId();
+  const fontStyleId = useId();
+  const textColorId = useId();
+  const dotSizeId = useId();
   const backgroundColorId = useId();
-  const particleColorId = useId();
-  const [dotSize, setDotSize] = useState(2);
-  const [imageSrc, setImageSrc] = useState("/images/Sidekick.logo.128.png");
-  const [backgroundColor, setBackgroundColor] = useState("#000000");
-  const [particleColor, setParticleColor] = useState("#ffffff");
 
-  const availableImages = [
-    { label: "Sidekick Logo 32px", value: "/images/Sidekick.logo.32.png" },
-    { label: "Sidekick Logo 64px", value: "/images/Sidekick.logo.64.png" },
-    { label: "Sidekick Logo 128px", value: "/images/Sidekick.logo.128.png" },
-    { label: "Sidekick Logo 256px", value: "/images/Sidekick.logo.256.png" },
+  const [text, setText] = useState("HELLO");
+  const [fontSize, setFontSize] = useState(200);
+  const [fontFamily, setFontFamily] = useState("Arial");
+  const [fontWeight, setFontWeight] = useState("normal");
+  const [fontStyle, setFontStyle] = useState("normal");
+  const [textColor, setTextColor] = useState("#ffffff");
+  const [dotSize, setDotSize] = useState(2);
+  const [backgroundColor, setBackgroundColor] = useState("#000000");
+
+  const fontFamilies = [
+    { label: "Arial", value: "Arial" },
+    { label: "Georgia", value: "Georgia" },
+    { label: "Times New Roman", value: "Times New Roman" },
+    { label: "Courier New", value: "Courier New" },
+    { label: "Verdana", value: "Verdana" },
+  ];
+
+  const fontWeights = [
+    { label: "Light (300)", value: "300" },
+    { label: "Normal (400)", value: "normal" },
+    { label: "Bold (700)", value: "bold" },
+    { label: "Bolder (900)", value: "900" },
+  ];
+
+  const fontStyles = [
+    { label: "Normal", value: "normal" },
+    { label: "Italic", value: "italic" },
+    { label: "Oblique", value: "oblique" },
   ];
 
   return (
@@ -25,9 +48,93 @@ function App() {
         <h1>Pixi Particle Controller</h1>
 
         <div className="control-group">
-          <label htmlFor={imageSizeId}>Dot Size:</label>
+          <label htmlFor={textId}>Text:</label>
           <input
-            id={imageSizeId}
+            id={textId}
+            type="text"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Enter text"
+            maxLength={20}
+          />
+          <span className="value-display">{text || "Empty"}</span>
+        </div>
+
+        <div className="control-group">
+          <label htmlFor={fontSizeId}>Font Size:</label>
+          <input
+            id={fontSizeId}
+            type="number"
+            min="50"
+            max="400"
+            value={fontSize}
+            onChange={(e) => setFontSize(Math.max(50, parseInt(e.target.value, 10) || 50))}
+          />
+          <span className="value-display">{fontSize}px</span>
+        </div>
+
+        <div className="control-group">
+          <label htmlFor={fontFamilyId}>Font Family:</label>
+          <select
+            id={fontFamilyId}
+            value={fontFamily}
+            onChange={(e) => setFontFamily(e.target.value)}
+          >
+            {fontFamilies.map((font) => (
+              <option key={font.value} value={font.value}>
+                {font.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="control-group">
+          <label htmlFor={fontWeightId}>Font Weight:</label>
+          <select
+            id={fontWeightId}
+            value={fontWeight}
+            onChange={(e) => setFontWeight(e.target.value)}
+          >
+            {fontWeights.map((weight) => (
+              <option key={weight.value} value={weight.value}>
+                {weight.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="control-group">
+          <label htmlFor={fontStyleId}>Font Style:</label>
+          <select
+            id={fontStyleId}
+            value={fontStyle}
+            onChange={(e) => setFontStyle(e.target.value)}
+          >
+            {fontStyles.map((style) => (
+              <option key={style.value} value={style.value}>
+                {style.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="control-group">
+          <label htmlFor={textColorId}>Text Color:</label>
+          <div className="color-input-wrapper">
+            <input
+              id={textColorId}
+              type="color"
+              value={textColor}
+              onChange={(e) => setTextColor(e.target.value)}
+            />
+            <span className="color-value">{textColor}</span>
+          </div>
+        </div>
+
+        <div className="control-group">
+          <label htmlFor={dotSizeId}>Dot Size:</label>
+          <input
+            id={dotSizeId}
             type="number"
             min="1"
             max="10"
@@ -35,21 +142,6 @@ function App() {
             onChange={(e) => setDotSize(Math.max(1, parseInt(e.target.value, 10) || 1))}
           />
           <span className="value-display">{dotSize}</span>
-        </div>
-
-        <div className="control-group">
-          <label htmlFor={imageSrcId}>Image Source:</label>
-          <select
-            id={imageSrcId}
-            value={imageSrc}
-            onChange={(e) => setImageSrc(e.target.value)}
-          >
-            {availableImages.map((img) => (
-              <option key={img.value} value={img.value}>
-                {img.label}
-              </option>
-            ))}
-          </select>
         </div>
 
         <div className="control-group">
@@ -64,22 +156,18 @@ function App() {
             <span className="color-value">{backgroundColor}</span>
           </div>
         </div>
-
-        <div className="control-group">
-          <label htmlFor={particleColorId}>Particle Color:</label>
-          <div className="color-input-wrapper">
-            <input
-              id={particleColorId}
-              type="color"
-              value={particleColor}
-              onChange={(e) => setParticleColor(e.target.value)}
-            />
-            <span className="color-value">{particleColor}</span>
-          </div>
-        </div>
       </div>
 
-      <PixiParticle dotSize={dotSize} imageSrc={imageSrc} backgroundColor={backgroundColor} particleColor={particleColor} />
+      <PixiParticle
+        text={text}
+        fontSize={fontSize}
+        fontFamily={fontFamily}
+        fontWeight={fontWeight}
+        fontStyle={fontStyle}
+        textColor={textColor}
+        dotSize={dotSize}
+        backgroundColor={backgroundColor}
+      />
     </div>
   );
 }

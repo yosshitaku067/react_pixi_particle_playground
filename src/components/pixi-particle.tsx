@@ -26,14 +26,81 @@ class Dot extends Sprite {
 }
 
 interface Props {
-  imageSrc: string;
+  text: string;
+  fontSize?: number;
+  fontFamily?: string;
+  fontWeight?: string | number;
+  fontStyle?: string;
+  textColor?: string | number;
   dotSize?: number;
   backgroundColor?: string | number;
-  particleColor?: string | number;
 }
 
-function PixiParticle({ dotSize = 2, imageSrc, backgroundColor = 0x000000, particleColor = 0xffffff }: Props) {
+function PixiParticle({
+  text,
+  fontSize = 200,
+  fontFamily = 'Arial',
+  fontWeight = 'normal',
+  fontStyle = 'normal',
+  textColor = 0xffffff,
+  dotSize = 2,
+  backgroundColor = 0x000000,
+}: Props) {
   const divRef = useRef<HTMLDivElement>(null);
+
+  const createTextImage = useCallback(async (
+    textContent: string,
+    fontSize_val: number,
+    fontFamily_val: string,
+    fontWeight_val: string | number,
+    fontStyle_val: string,
+    textColor_val: string | number,
+  ): Promise<HTMLImageElement> => {
+    // テキスト色を数値に変換
+    let textColorNum: number;
+    if (typeof textColor_val === 'string') {
+      textColorNum = parseInt(textColor_val.replace('#', ''), 16);
+    } else {
+      textColorNum = textColor_val;
+    }
+    const textColorHex = `#${textColorNum.toString(16).padStart(6, '0')}`;
+
+    // フォント文字列を構築
+    const fontString = `${fontStyle_val} ${fontWeight_val} ${fontSize_val}px ${fontFamily_val}`;
+
+    // テンポラリCanvasでテキストのサイズを測定
+    const measureCanvas = document.createElement('canvas');
+    const measureCtx = measureCanvas.getContext('2d');
+    if (!measureCtx) {
+      throw new Error('Failed to get canvas context');
+    }
+    measureCtx.font = fontString;
+    const metrics = measureCtx.measureText(textContent);
+    const textWidth = Math.ceil(metrics.width) + 40;
+    const textHeight = Math.ceil(fontSize_val) + 20;
+
+    // 本画面Canvasを作成
+    const canvas = document.createElement('canvas');
+    canvas.width = textWidth;
+    canvas.height = textHeight;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('Failed to get canvas context');
+    }
+
+    ctx.font = fontString;
+    ctx.fillStyle = textColorHex;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(textContent, textWidth / 2, textHeight / 2);
+
+    // CanvasからImage要素を生成
+    const image = new Image();
+    image.src = canvas.toDataURL();
+    await image.decode();
+
+    return image;
+  }, []);
 
   const init = useCallback(async () => {
     if (!divRef.current) {
@@ -42,10 +109,8 @@ function PixiParticle({ dotSize = 2, imageSrc, backgroundColor = 0x000000, parti
 
     NoiseGenerator.seed(Date.now());
 
-    // 画像を読み込む
-    const image = new Image();
-    image.src = imageSrc;
-    await image.decode();
+    // テキストから画像を生成
+    const image = await createTextImage(text, fontSize, fontFamily, fontWeight, fontStyle, textColor);
 
     // PIXIのアプリケーションを作成する
     const app = new Application();
@@ -59,13 +124,13 @@ function PixiParticle({ dotSize = 2, imageSrc, backgroundColor = 0x000000, parti
       bgColor = backgroundColor;
     }
 
-    // パーティクル色を数値に変換（必要な場合）
+    // パーティクル色を数値に変換（textColorを使用）
     let particleColorNum: number;
-    if (typeof particleColor === "string") {
+    if (typeof textColor === "string") {
       // HEX文字列を数値に変換
-      particleColorNum = parseInt(particleColor.replace("#", ""), 16);
+      particleColorNum = parseInt(textColor.replace("#", ""), 16);
     } else {
-      particleColorNum = particleColor;
+      particleColorNum = textColor;
     }
 
     await app.init({
@@ -220,7 +285,7 @@ function PixiParticle({ dotSize = 2, imageSrc, backgroundColor = 0x000000, parti
     };
     window.addEventListener("resize", resize);
     resize();
-  }, [dotSize, imageSrc, backgroundColor, particleColor]);
+  }, [text, fontSize, fontFamily, fontWeight, fontStyle, textColor, dotSize, backgroundColor, createTextImage]);
 
   useEffect(() => {
     init();
