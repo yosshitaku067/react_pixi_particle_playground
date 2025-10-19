@@ -6,6 +6,7 @@
 
 .control-panel {
   width: 300px;
+  max-width: 30vw;
   background-color: #1e1e1e;
   color: #ffffff;
   padding: 20px;
@@ -62,6 +63,21 @@
   font-size: 0.8rem;
   color: #888888;
   margin-top: 4px;
+}
+
+.control-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.control-row .control-group {
+  margin-bottom: 0;
+}
+
+.control-group.full-width {
+  grid-column: 1 / -1;
 }
 
 .color-input-wrapper {

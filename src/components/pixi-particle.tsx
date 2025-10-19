@@ -34,6 +34,13 @@ interface Props {
   textColor?: string | number;
   dotSize?: number;
   backgroundColor?: string | number;
+  animationDuration?: number;
+  amplitudeX?: number;
+  amplitudeY?: number;
+  noiseScaleX?: number;
+  noiseScaleY?: number;
+  initialContainerScale?: number;
+  finalContainerScale?: number;
 }
 
 function PixiParticle({
@@ -45,6 +52,13 @@ function PixiParticle({
   textColor = 0xffffff,
   dotSize = 2,
   backgroundColor = 0x000000,
+  animationDuration = 2,
+  amplitudeX = 1500,
+  amplitudeY = 500,
+  noiseScaleX = 4,
+  noiseScaleY = 3,
+  initialContainerScale = 0.4,
+  finalContainerScale = 0.5,
 }: Props) {
   const divRef = useRef<HTMLDivElement>(null);
 
@@ -231,15 +245,15 @@ function PixiParticle({
       // パーリンノイズでパーティクルの移動座標を決める。
       // パーリンノイズだと連続性が生まれるので、波打つ表現になる。
       // 乗算は周期と考えてもらえばOK。
-      const px = NoiseGenerator.perlin2(nx * 4, ny * 3);
-      const py = NoiseGenerator.perlin2(nx * 3, ny * 2);
+      const px = NoiseGenerator.perlin2(nx * noiseScaleX, ny * noiseScaleY);
+      const py = NoiseGenerator.perlin2(nx * noiseScaleY, ny * (noiseScaleY - 1));
 
       // 水平方向に遅延させるけど、ちょっとばらしている。
       const baseDelay =
         (dot.offsetIndex % lengthW) * 0.001 + Math.random() * 0.2;
 
-      const perlinAmpX = 1500 * (nx * 2 + 1);
-      const perlinAmpY = 500 * (nx * 2 + 1);
+      const perlinAmpX = amplitudeX * (nx * 2 + 1);
+      const perlinAmpY = amplitudeY * (nx * 2 + 1);
       const randomAmp = 10 * (nx * 2 + 1);
 
       const scale = nx * 3 + 1;
@@ -252,7 +266,7 @@ function PixiParticle({
           alpha: 0,
           scaleX: scale,
           scaleY: scale,
-          duration: 2,
+          duration: animationDuration,
           ease: "expo.inOut",
         },
         baseDelay,
@@ -264,17 +278,17 @@ function PixiParticle({
           alpha: 0,
           scaleX: scale,
           scaleY: scale,
-          duration: 2.5,
+          duration: animationDuration * 1.25,
           ease: "expo.out",
         },
-        ">2",
+        `>${animationDuration}`,
       );
     }
 
     tl.fromTo(
       container.scale,
-      { x: 0.4, y: 0.4 },
-      { x: 0.5, y: 0.5, duration: 5, ease: "none" },
+      { x: initialContainerScale, y: initialContainerScale },
+      { x: finalContainerScale, y: finalContainerScale, duration: 5, ease: "none" },
       0,
     );
 
@@ -285,7 +299,7 @@ function PixiParticle({
     };
     window.addEventListener("resize", resize);
     resize();
-  }, [text, fontSize, fontFamily, fontWeight, fontStyle, textColor, dotSize, backgroundColor, createTextImage]);
+  }, [text, fontSize, fontFamily, fontWeight, fontStyle, textColor, dotSize, backgroundColor, animationDuration, amplitudeX, amplitudeY, noiseScaleX, noiseScaleY, initialContainerScale, finalContainerScale, createTextImage]);
 
   useEffect(() => {
     init();
